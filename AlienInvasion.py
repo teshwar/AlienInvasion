@@ -5,6 +5,7 @@ import pygame
 
 from Settings import Settings
 from Ship import Ship
+from Bullet import Bullet
 
 """Overall class to manage different class + logic"""
 class AlienInvasion:
@@ -29,8 +30,9 @@ class AlienInvasion:
 
         pygame.display.set_caption("Alien Invasion")
 
-        #Ship and Alien
+        #Ship and Bullets Group
         self.ship = Ship(self)
+        self.bullets = pygame.sprite.Group()
 
 
     def run_game(self):
@@ -43,9 +45,11 @@ class AlienInvasion:
             # Update ship
             self.ship.update()
 
+            # UPdate bullets & delete bullets if they went out of range
+            self._update_bullets()
+
             # Redraw screen everytime through the loop
             self._update_screen()
-
             self.clock.tick(60)
 
     def _check_events(self):
@@ -76,8 +80,15 @@ class AlienInvasion:
             # Move the ship to right
             self.ship.moving_left = True
         
+        # Qutting game with q
         if event.key == pygame.K_q:
             sys.exit()
+        
+        # Bullets spacebar
+        if event.key == pygame.K_SPACE:
+            self._fire_bullet()
+
+        
 
     def _check_keyup_events(self, event):
         """
@@ -88,6 +99,23 @@ class AlienInvasion:
 
         if event.key == pygame.K_LEFT:
             self.ship.moving_left = False
+
+    def _fire_bullet(self):
+        """
+        Create new bullet and add it to bullet group
+        """
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+        # Update bullets
+        self.bullets.update()
+
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+
            
     def _update_screen(self):
         """"
@@ -96,6 +124,10 @@ class AlienInvasion:
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
         
+        # bullets
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
         # Update game frame
         pygame.display.flip()
 
