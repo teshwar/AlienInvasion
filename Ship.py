@@ -1,15 +1,17 @@
 import pygame
 import logging
+from pygame.sprite import Sprite
 
 """"
 A class to manage the ship
 """
 
-class Ship:
+class Ship(Sprite):
     def __init__(self,alienInvasion):
         """
         Initialsie the ship and set its starting position
         """
+        super().__init__()
         #logging setup
         logging.basicConfig(level=logging.DEBUG)
 
